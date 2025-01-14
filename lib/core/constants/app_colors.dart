@@ -23,7 +23,7 @@ class AppColors {
   static const Color primaryChatColor = Color(0xFF4691DC); // Medical Blue for chat
   static const Color secondaryChatColor = Color(0xFF6C757D); // Neutral gray for chat
 
-  // Additional Colors
+  // Additional Colorss
   static const Color errorColor = Color(0xFFD32F2F);  // Red for error messages
   static const Color successColor = Color(0xFF388E3C); // Green for success messages
   static const Color nexusGreen = Color(0xFF4691DC);  // Medical Blue for secondary success
