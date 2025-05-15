@@ -38,9 +38,9 @@ class DoctorCard extends StatelessWidget {
       ),
       onDismissed: (direction) {
         if (direction == DismissDirection.startToEnd) {
-          onEdit; // Trigger edit action
+          onEdit(); // Trigger edit action
         } else if (direction == DismissDirection.endToStart) {
-          onDelete; // Trigger delete action
+          onDelete(); // Trigger delete action
         }
       },
       child: Card(
@@ -61,7 +61,7 @@ class DoctorCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  doctorModel.name,
+                  'Dr ${doctorModel.name}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),

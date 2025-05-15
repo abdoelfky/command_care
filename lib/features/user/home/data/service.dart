@@ -18,16 +18,3 @@ final servicesProvider = Provider<List<Service>>((ref) => [
 ]);
 
 
-// Doctor Model
-class Doctor {
-  final String name;
-  final String initial;
-
-  Doctor(this.name, this.initial);
-}
-
-
-final doctorsProvider = Provider<List<Doctor>>((ref) => [
-  Doctor('Dr. Himesh Kailasia', 'D'),
-  Doctor('Dr. Eugene Precious', 'E'),
-]);

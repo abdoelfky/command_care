@@ -7,15 +7,15 @@ import 'features/splash/presentation/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(
-  //     options: FirebaseOptions(
-  //       apiKey: 'AIzaSyAuhuxtYqkoZJXSZkjO7HWKXAcmGUvuH_I',
-  //       appId: 'condo-5ad01',
-  //       messagingSenderId: 'sendid',
-  //       projectId: 'condo-5ad01',
-  //       storageBucket: 'condo-5ad01.appspot.com',
-  //     )
-  // );
+  await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: 'AIzaSyCPs0_j_zGG8dCaxcSKFx02-XvIyBPj_Ek',
+        appId: 'command-care-1613a',
+        messagingSenderId: 'sendid',
+        projectId: 'command-care-1613a',
+        // storageBucket: 'condo-5ad01.appspot.com',
+      )
+  );
   await AppSettingsPreferences.init();
   runApp(ProviderScope(child: MyApp()));
 }

@@ -6,7 +6,7 @@ class AppColors {
   static const Color accentColor = Color(0xFFFFFFFF);  // White for accents
 
   // Background Colors
-  static const Color backgroundColor = Color(0xFFF5F5F5); // Light gray for background
+  static const Color backgroundColor = Color(0xFFC7D2DF); // Light gray for background
   static const Color scaffoldBackgroundColor = Color(0xFFFFFFFF); // White for scaffold background
 
   // Text Colors

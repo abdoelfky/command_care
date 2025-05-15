@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:command_care/features/auth/data/User.dart';
 import 'package:command_care/features/doctor/home/presentation/dashboard.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:command_care/core/constants/app_constants.dart';
@@ -14,89 +16,59 @@ class AuthService {
 
   AuthService(this.ref);
 
-  // Future<void> handleLogin(
-  //     BuildContext context, String email, String password) async {
-  //   final authService = ref.read(firebaseAuthServiceProvider);
-  //   final success = await authService.signIn(
-  //       context: context, email: email, password: password);
-  //   if (success) {
-  //     print(AppSettingsPreferences().userType.toLowerCase().toString());
-  //     if (AppSettingsPreferences().userType.toLowerCase() ==
-  //         UserType.admin.value.toLowerCase()) {
-  //       Future.delayed(Duration(milliseconds: 500), () {
-  //         Navigator.pushReplacement(context,
-  //             MaterialPageRoute(builder: (_) => AdminDashBoardScreen()));
-  //       });
-  //     } else {
-  //       Future.delayed(Duration(milliseconds: 500), () {
-  //         Navigator.pushReplacement(context,
-  //             MaterialPageRoute(builder: (_) => UserDashBoardScreen()));
-  //       });
-  //     }
-  //   }
-  // }
-
-  Future<void> handleLogin(
-      BuildContext context, String email, String password) async {
+  Future<void> handleLogin(BuildContext context, String email, String password) async {
     try {
-      if (email == 'admin@gmail.com' && password == '12344321') {
-        await AppSettingsPreferences().saveUser(
-          user: UserData(
-            id: '1',
-            userType: 'admin',
-            phoneNumber: '010626095550',
-            name: 'Admin User',
-            email: email,
-            password: password,
-          ),
-        );
+      // Sign in with Firebase Auth
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-        await Future.delayed(Duration(milliseconds: 500));
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => AdminDashBoardScreen()),
-              (Route<dynamic> route) => false, // Removes all previous routes
-        );
-      } else if (email == 'user@gmail.com' && password == '12344321') {
-        await AppSettingsPreferences().saveUser(
-          user: UserData(
-            id: '2',
-            userType: 'user',
-            phoneNumber: '010626095550',
-            name: 'Regular User',
-            email: email,
-            password: password,
-          ),
-        );
+      final uid = credential.user!.uid;
 
-        await Future.delayed(Duration(milliseconds: 500));
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => UserDashBoardScreen()),
-              (Route<dynamic> route) => false, // Removes all previous routes
-        );
+      // Get user role from Firestore
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (!userDoc.exists) {
+        throw Exception('User data not found in database');
       }
-      else if (email == 'doctor@gmail.com' && password == '12344321') {
-        await AppSettingsPreferences().saveUser(
-          user: UserData(
-            id: '2',
-            userType: 'doctor',
-            phoneNumber: '010626095550',
-            name: 'Dr Mohamed',
-            email: email,
-            password: password,
-          ),
-        );
 
-        await Future.delayed(Duration(milliseconds: 500));
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => DoctorDashBoardScreen()),
-              (Route<dynamic> route) => false, // Removes all previous routes
-        );
-      }else {
-        throw Exception('Invalid email or password');
+      final userData = userDoc.data()!;
+      final userType = userData['userType'];
+
+      // Save locally if you need (optional)
+      await AppSettingsPreferences().saveUser(
+        user: UserData(
+          id: uid,
+          gender: userData['gender']??'',
+          userType: userType,
+          phoneNumber: userData['phoneNumber'],
+          name: userData['name'],
+          email: email,
+          password: password,
+        ),
+      );
+
+      await Future.delayed(Duration(milliseconds: 500));
+
+      // Navigate based on user type
+      Widget destinationScreen;
+      if (userType == 'admin') {
+        destinationScreen = AdminDashBoardScreen();
+      } else if (userType == 'user') {
+        destinationScreen = UserDashBoardScreen();
+      } else if (userType == 'doctor') {
+        destinationScreen = DoctorDashBoardScreen();
+      } else {
+        throw Exception('Unknown user type');
       }
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => destinationScreen),
+            (Route<dynamic> route) => false,
+      );
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: ${e.toString()}')),

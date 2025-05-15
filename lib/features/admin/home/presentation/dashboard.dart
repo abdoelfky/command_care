@@ -1,6 +1,6 @@
 import 'package:command_care/features/admin/admin_appointments/presentation/admin_appointment_screen.dart';
 import 'package:command_care/features/admin/doctors/presentation/doctors_screen.dart';
-import 'package:command_care/features/admin/patients/presentation/patient_screen.dart';
+import 'package:command_care/features/admin/patients/presentation/patients_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:command_care/features/profile/profile_screen.dart';

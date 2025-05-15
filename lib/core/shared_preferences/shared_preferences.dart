@@ -32,6 +32,7 @@ class AppSettingsPreferences {
 
   Future<void> saveUser({required UserData user}) async {
     sharedPreferences!.setString('id', user.id ?? "");
+    sharedPreferences!.setString('gender', user.gender ?? "");
      sharedPreferences!.setString('name', user.name ?? "");
      sharedPreferences!.setString('email', user.email ?? "");
      sharedPreferences!.setString('phoneNumber', user.phoneNumber ?? "");
@@ -42,29 +43,14 @@ class AppSettingsPreferences {
   Future<void> setOnboarding({required bool value}) async {
     sharedPreferences!.setBool('isOnboarding', value);
   }
-
-  // Future<void> saveStore({required StoreData store}) async {
-  //   sharedPreferences!.setString('id', store.id ?? "");
-  //   sharedPreferences!.setString('name', store.name ?? "");
-  //   sharedPreferences!.setString('email', store.email ?? "");
-  //   sharedPreferences!.setString('image', store.image ?? "");
-  //   sharedPreferences!.setString('phoneNumber', store.phoneNumber ?? "");
-  //   sharedPreferences!.setString('password', store.password ?? "");
-  //   sharedPreferences!.setString('userType', store.userType ?? "");
-  //   sharedPreferences!.setInt('availableCups', store.availableCups ?? 0);
-  //   sharedPreferences!.setDouble('package1', store.package1 ?? 0);
-  //   sharedPreferences!.setDouble('package2', store.package2 ?? 0);
-  //   sharedPreferences!.setBool('isVerified', store.isVerified ?? false);
-  //   sharedPreferences!.setBool('isGuest', false);
-  // }
-  //
-  // Future<void> setAvailableCups({required int availableCups}) async {
-  //   sharedPreferences!.setInt('availableCups', availableCups ?? 0);
-  // }
+  Future<void> setGender({required String gender}) async {
+    sharedPreferences!.setString('gender', gender);
+  }
 
   UserData user() {
-    UserData user = new UserData(
-        id:  sharedPreferences!.getString('id')!,
+    UserData user = UserData(
+      id:  sharedPreferences!.getString('id')!,
+      gender:  sharedPreferences!.getString('gender')!,
         userType:  sharedPreferences!.getString('userType')!,
         name:  sharedPreferences!.getString('name')!,
         email:  sharedPreferences!.getString('email')!,
@@ -86,6 +72,7 @@ class AppSettingsPreferences {
   String get id =>  sharedPreferences!.getString('id') ?? '';
   String get phoneNumber =>  sharedPreferences!.getString('phoneNumber') ?? '';
   String get email =>  sharedPreferences!.getString('email') ?? '';
+  String get gender =>  sharedPreferences!.getString('gender') ?? '';
   String get userType =>  sharedPreferences!.getString('userType') ?? '';
   String get name =>  sharedPreferences!.getString('name') ?? '';
   String get image =>  sharedPreferences!.getString('image') ?? '';

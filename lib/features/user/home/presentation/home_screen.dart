@@ -21,7 +21,6 @@ class HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 HeaderName(),
-                ServicesSection(),
                 const SizedBox(height: Dimensions.paddingSizeDefault),
                 TopDoctorsSection(),
                 const SizedBox(height: Dimensions.paddingSizeDefault),

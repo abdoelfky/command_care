@@ -3,6 +3,8 @@ import 'package:command_care/core/utils/dimensions.dart';
 import 'package:command_care/features/user/appointments/data/appointment_model.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../admin/admin_appointments/data/appointment_model.dart';
+
 class AppointmentCard extends StatelessWidget {
   final Appointment appointment;
 

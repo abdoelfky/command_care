@@ -1,4 +1,5 @@
 import 'package:command_care/core/constants/app_images.dart';
+import 'package:command_care/features/admin/admin_appointments/data/appointment_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'appointment_model.dart';
 

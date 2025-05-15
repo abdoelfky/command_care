@@ -7,7 +7,7 @@ class PasswordField extends StatelessWidget {
   final VoidCallback onVisibilityToggle;
   final String text;
 
-  PasswordField({
+  const PasswordField({super.key,
     required this.controller,
     required this.obscureText,
     required this.onVisibilityToggle
@@ -37,7 +37,7 @@ class PasswordField extends StatelessWidget {
           Icons.vpn_key_outlined,
           color: AppColors.nexusGreen,
         ),        filled: true,
-        fillColor: Colors.white.withOpacity(0.5),
+        fillColor: Colors.white,
         suffixIcon: IconButton(
           icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
           onPressed: onVisibilityToggle,

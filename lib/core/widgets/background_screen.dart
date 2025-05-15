@@ -25,19 +25,19 @@ class _BackgroundScreenState extends ConsumerState<BackgroundScreen> {
     return Stack(
       children: [
         // Conditionally render background color or image
-        if (widget.backgroundColor != null)
+        // if (widget.backgroundColor != null)
           Positioned.fill(
             child: Container(
               color: widget.backgroundColor, // Fill with the specified color
             ),
           ),
-         if (widget.imgSrc != null)
-          Positioned.fill(
-            child: Image.asset(
-              widget.imgSrc!, // Replace with the image path
-              fit: BoxFit.cover,
-            ),
-          ),
+         // if (widget.imgSrc != null)
+         //  Positioned.fill(
+         //    child: Image.asset(
+         //      widget.imgSrc!, // Replace with the image path
+         //      fit: BoxFit.cover,
+         //    ),
+         //  ),
         // Content on top of the background
         Positioned.fill(
           child: widget.child,

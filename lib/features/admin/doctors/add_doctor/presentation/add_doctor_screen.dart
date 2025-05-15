@@ -1,4 +1,5 @@
 import 'package:command_care/features/admin/doctors/add_doctor/controllers/add_doctor_controller.dart';
+import 'package:command_care/features/admin/doctors/controllers/doctors_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:command_care/core/constants/app_colors.dart';
@@ -10,7 +11,6 @@ import 'package:command_care/core/widgets/PrimaryTextFormField.dart';
 import 'package:command_care/core/widgets/background_screen.dart';
 import 'package:command_care/core/widgets/primary_app_bar.dart';
 import 'package:command_care/features/auth/presentation/widgets/passwordField.dart';
-
 
 class AddDoctorScreen extends ConsumerStatefulWidget {
   const AddDoctorScreen({super.key});
@@ -46,14 +46,15 @@ class _AddDoctorScreenState extends ConsumerState<AddDoctorScreen> {
       await signUpController.addDoctor(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-        phone: _phoneController.text.trim(), name: _nameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        name: _nameController.text.trim(),
       );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             backgroundColor: AppColors.successColor,
             content: Text('User added successfully')),
-
       );
+      ref.refresh(doctorsProvider);
       _emailController.clear();
       _passwordController.clear();
       _phoneController.clear();
@@ -90,6 +91,7 @@ class _AddDoctorScreenState extends ConsumerState<AddDoctorScreen> {
                   ),
                   child: PrimaryTextFormField(
                     controller: _phoneController,
+                    keyboardType: TextInputType.phone,
                     label: 'Phone',
                     validator: (value) => value?.isEmpty ?? true
                         ? 'Please enter a phone number'
@@ -105,9 +107,8 @@ class _AddDoctorScreenState extends ConsumerState<AddDoctorScreen> {
                   child: PrimaryTextFormField(
                     controller: _nameController,
                     label: 'Name',
-                    validator: (value) => value?.isEmpty ?? true
-                        ? 'Please enter a name'
-                        : null,
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Please enter a name' : null,
                     prefixIcon: Icons.person_add_outlined,
                   ),
                 ),
@@ -116,17 +117,40 @@ class _AddDoctorScreenState extends ConsumerState<AddDoctorScreen> {
                   padding: const EdgeInsets.symmetric(
                     horizontal: Dimensions.paddingSizeExtraLarge,
                   ),
-                  child: PrimaryTextFormField(
-                    controller: _specialisationController,
-                    label: 'Specialisation',
-                    validator: (value) => value?.isEmpty ?? true
-                        ? 'Please enter a specialisation'
+                  child: DropdownButtonFormField<String>(
+                    value: _specialisationController.text.isNotEmpty
+                        ? _specialisationController.text
                         : null,
-                    prefixIcon: Icons.code,
+                    decoration: InputDecoration(
+                      filled: true,
+                      labelStyle: TextStyle(color: AppColors.primaryTextColor),
+                      fillColor: AppColors.whiteColor,
+                      labelText: 'Specialisation',
+                      prefixIcon: Icon(
+                        Icons.code,
+                        color: AppColors.nexusGreen,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    items: ['Physicians', 'Surgery', 'Radiology']
+                        .map((specialisation) => DropdownMenuItem(
+                              value: specialisation,
+                              child: Text(specialisation),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        _specialisationController.text = value;
+                      }
+                    },
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Please select a specialisation'
+                        : null,
                   ),
                 ),
                 SizedBox(height: Dimensions.fontSizeDefault),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: Dimensions.paddingSizeExtraLarge,
@@ -134,8 +158,10 @@ class _AddDoctorScreenState extends ConsumerState<AddDoctorScreen> {
                   child: PrimaryTextFormField(
                     controller: _emailController,
                     label: 'Email',
+                    keyboardType: TextInputType.emailAddress,
+
                     validator: (value) =>
-                    value?.isEmpty ?? true ? 'Please enter an email' : null,
+                        value?.isEmpty ?? true ? 'Please enter an email' : null,
                     prefixIcon: Icons.email,
                   ),
                 ),

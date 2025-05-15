@@ -6,10 +6,10 @@ class GenderField extends StatelessWidget {
   final ValueChanged<String> onChanged;
 
   const GenderField({
-    Key? key,
+    super.key,
     required this.selectedGender,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

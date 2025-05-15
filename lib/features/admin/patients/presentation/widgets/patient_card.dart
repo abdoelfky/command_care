@@ -69,13 +69,13 @@ class PatientCard extends StatelessWidget {
               ),
               Chip(
                 label: Text(
-                  patient.status,
+                  patient.status?"active":"non active",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12, // Smaller font for compact design
                   ),
                 ),
-                backgroundColor: Colors.green,
+                backgroundColor: patient.status?Colors.green:Colors.red,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20), // Increased radius
@@ -89,8 +89,8 @@ class PatientCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('📞 ${patient.phone}'),
-              Text('🧑 ${patient.gender}'),
-              Text('📑 ${patient.encounterStatus}'),
+              // Text('🧑 ${patient.gender}'),
+              // Text('📑 ${patient.encounterStatus}'),
             ],
           ),
         ),

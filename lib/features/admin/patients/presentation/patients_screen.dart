@@ -2,22 +2,20 @@ import 'package:command_care/core/constants/app_colors.dart';
 import 'package:command_care/core/utils/dimensions.dart';
 import 'package:command_care/core/widgets/background_screen.dart';
 import 'package:command_care/core/widgets/header_name.dart';
-import 'package:command_care/features/admin/doctors/add_doctor/controllers/add_doctor_controller.dart';
-import 'package:command_care/features/admin/doctors/add_doctor/presentation/add_doctor_screen.dart';
-import 'package:command_care/features/admin/doctors/controllers/doctors_provider.dart';
-import 'package:command_care/features/admin/doctors/controllers/patient_search_provider.dart';
-import 'package:command_care/features/admin/doctors/presentation/widgets/doctor_card.dart';
+import 'package:command_care/features/admin/patients/add_patient/presentation/add_user_screen.dart';
+import 'package:command_care/features/admin/patients/controllers/patient_search_provider.dart';
+import 'package:command_care/features/admin/patients/controllers/patients_provider.dart';
+import 'package:command_care/features/admin/patients/presentation/widgets/patient_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DoctorsScreen extends ConsumerWidget {
-  const DoctorsScreen({super.key});
+class PatientsScreen extends ConsumerWidget {
+  const PatientsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final doctorAsyncValue = ref.watch(filteredDoctorsProvider);
-    final searchQuery = ref.watch(doctorSearchQueryProvider.notifier);
-    final handleDoctorsController = ref.read(addDoctorControllerProvider.notifier);
+    final patientAsyncValue = ref.watch(filteredPatientProvider);
+    final searchQuery = ref.watch(patientSearchQueryProvider.notifier);
 
     return Scaffold(
       body: BackgroundScreen(
@@ -32,7 +30,7 @@ class DoctorsScreen extends ConsumerWidget {
               child: TextField(
                 onChanged: (value) => searchQuery.state = value,
                 decoration: InputDecoration(
-                  hintText: 'Search doctor',
+                  hintText: 'Search Patient',
                   hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 16),
                   prefixIcon: Icon(Icons.search, color: Colors.blue),
                   enabledBorder: OutlineInputBorder(
@@ -46,7 +44,7 @@ class DoctorsScreen extends ConsumerWidget {
                   filled: true,
                   fillColor: Colors.grey.shade100,
                 ),
-                style: TextStyle(color: Colors.black, fontSize: 16),
+                style: const TextStyle(color: Colors.black, fontSize: 16),
               ),
             ),
             const Padding(
@@ -56,21 +54,17 @@ class DoctorsScreen extends ConsumerWidget {
                 style: TextStyle(color: Colors.redAccent, fontSize: 12),
               ),
             ),
-            doctorAsyncValue.when(
-              data: (doctors) => Expanded(
-                child: doctors.isEmpty
-                    ? const Center(child: Text('No doctors found.'))
+            patientAsyncValue.when(
+              data: (patients) => Expanded(
+                child: patients.isEmpty
+                    ? const Center(child: Text('No patients found.'))
                     : ListView.builder(
-                  itemCount: doctors.length,
+                  itemCount: patients.length,
                   itemBuilder: (context, index) {
-                    final doctor = doctors[index];
-                    return DoctorCard(
-                      key: ValueKey(doctor.id),
-                      doctorModel: doctor,
-                      onDelete: () async {
-                        await handleDoctorsController.removeDoctor(uid: doctor.id);
-                        ref.refresh(doctorsProvider);
-                      },
+                    final patient = patients[index];
+                    return PatientCard(
+                      patient: patient,
+                      onDelete: () {},
                       onEdit: () {},
                     );
                   },
@@ -86,8 +80,8 @@ class DoctorsScreen extends ConsumerWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddDoctorScreen()),
-          ).then((_) => ref.refresh(doctorsProvider));
+            MaterialPageRoute(builder: (context) => const AddPatientScreen()),
+          ).then((_) => ref.refresh(patientProvider));
         },
         backgroundColor: AppColors.floatingActionButtonColor,
         child: Icon(Icons.add, color: AppColors.whiteColor),

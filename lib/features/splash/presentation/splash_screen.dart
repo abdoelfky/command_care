@@ -49,24 +49,10 @@ class SplashScreen extends ConsumerWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child:Stack(
-                children: [
-                  Image.asset(
-                    AppImages.splashBackground, // Replace with the image path
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                  Container(
-                    color: Colors.black.withOpacity(0.5), // Black layer with 50% opacity
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                ],
-              )
-
-            ),
-            // Centered Image
+              child: Container(
+                color: AppColors.backgroundColor, // Fill with the specified color
+              ),
+            ),            // Centered Image
             Positioned(
               top: MediaQuery.of(context).size.height*.4,
               left: 0,

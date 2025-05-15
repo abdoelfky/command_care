@@ -1,5 +1,8 @@
 import 'package:command_care/features/help/presentation/UserHelpScreen.dart';
+import 'package:command_care/features/settings/change_password.dart';
 import 'package:command_care/features/user/home/controllers/bottom_nav_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:command_care/core/constants/app_colors.dart';
@@ -9,7 +12,7 @@ import 'package:command_care/core/utils/dimensions.dart';
 import 'package:command_care/core/widgets/background_screen.dart';
 import 'package:command_care/core/widgets/primary_app_bar.dart';
 import 'package:command_care/features/auth/controllers/auth_provider.dart';
-import 'package:command_care/features/settings/settings.dart';
+import '../settings/profile_settings/presentation/EditProfileScreen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -24,7 +27,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PrimaryAppBar(
-        title: 'Good Afternoon, Afe',
+        title: 'Good Afternoon, ${AppSettingsPreferences().name}',
       ),
       body: BackgroundScreen(
         child: Stack(
@@ -40,73 +43,150 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Group 1 (No spacing between tiles)
-                    buildListTile("Account Settings", Icons.settings, () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => SettingsScreen()));
-                    }),
-                    buildListTile("Help", Icons.privacy_tip, () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              HelpScreen(),
-                        ),
-                      );
-                    }),
-                    buildListTile("Log Out", Icons.exit_to_app, () {
+
+                    // buildListTile("Help", Icons.privacy_tip, () {
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (_) => HelpScreen(),
+                    //     ),
+                    //   );
+                    // }),
+
+                    buildListTile(
+                        // Colors.black,
+                        "Delete my account",
+                        Icons.delete_outline_outlined, () async {
                       showDialog(
                           context: context,
                           builder: (_) => AlertDialog(
                                 elevation: 24.0,
-                                title: Center(
-                                  child: Text(
-                                    'Are you sure?',
-                                    style: TextStyle(
-                                        fontSize: 22, color: Colors.black),
-                                  ),
+                                title: const Text(
+                                  'Are you sure',
                                 ),
-                                content: Text(
-                                  'You will be logged out from your account.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                ),
+                                content: const Text(
+                                    'We can\'t recover your account again'),
                                 actions: [
-                                  TextButton(
+                                  CupertinoDialogAction(
                                     child: Text(
-                                      'Log Out',
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.red),
+                                      'Delete',
+                                      style: TextStyle(color: Colors.red),
                                     ),
                                     onPressed: () {
-                                      ref
-                                          .read(firebaseAuthServiceProvider)
-                                          .signOut(context)
-                                          .then((onValue) {
-                                        ref
-                                            .read(bottomNavProvider.notifier)
-                                            .selectIndex(0);
+                                      setState(() {
+                                        var user =
+                                            FirebaseAuth.instance.currentUser;
+                                        if (user != null) {
+                                          user.delete().then((value) async {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'account deleted successfully',
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.successColor,
+                                              ),
+                                            );
+                                            ref
+                                                .read(
+                                                    firebaseAuthServiceProvider)
+                                                .signOut(context);
+
+                                            // FbAuthController().signOut();
+                                          }).catchError((onError) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      'account delete failed: ${onError.toString()}')),
+                                            );
+                                          });
+                                        }
                                       });
+                                      Navigator.pop(context);
                                     },
                                   ),
-                                  TextButton(
-                                    child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                        color: Colors.green,
-                                        fontSize: 16,
-                                      ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 1.0, horizontal: 15),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 0.4,
+                                      color: Colors.grey,
                                     ),
+                                  ),
+                                  CupertinoDialogAction(
+                                    child: Text('Cancel'),
                                     onPressed: () {
+                                      setState(() {});
                                       Navigator.pop(context);
                                     },
                                   ),
                                 ],
                               ));
                     }),
+                    buildListTile(
+                      // Colors.black,
+                        "Change password",
+                        Icons.lock_outlined, () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => ChangePasswordScreen()));
+                    }),
+                    buildListTile("Log Out", Icons.exit_to_app, () {
+                      showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            elevation: 24.0,
+                            title: Center(
+                              child: Text(
+                                'Are you sure?',
+                                style: TextStyle(
+                                    fontSize: 22, color: Colors.black),
+                              ),
+                            ),
+                            content: Text(
+                              'You will be logged out from your account.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.black),
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text(
+                                  'Log Out',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.red),
+                                ),
+                                onPressed: () {
+                                  ref
+                                      .read(firebaseAuthServiceProvider)
+                                      .signOut(context)
+                                      .then((onValue) {
+                                    ref
+                                        .read(bottomNavProvider.notifier)
+                                        .selectIndex(0);
+                                  });
+                                },
+                              ),
+                              TextButton(
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          ));
+                    }),
 
-                    // Add bottom padding to ensure the last item is fully visible
                     SizedBox(height: 20),
                   ],
                 ),
@@ -120,50 +200,56 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 }
 
 Widget profileHeader(BuildContext context) {
-  return Stack(
-    children: [
-      Stack(
-        children: [
-          Image.asset(
-            AppImages.bannerImg3, // Replace with the image path
-            fit: BoxFit.fill,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-          Container(
-            color: Colors.black.withOpacity(0.5),
-            // Black layer with 50% opacity
-            width: double.infinity,
-            height: double.infinity,
-          ),
-        ],
-      ),
-      Positioned(
-        right: 0,
-        left: 0,
-        top: Dimensions.paddingSizeSmall,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
+    },
+    child: Stack(
+      children: [
+        Stack(
           children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: AppColors.whiteColor,
-              backgroundImage: AssetImage(AppImages.user),
+            Image.asset(
+              AppImages.bannerImg3, // Replace with the image path
+              fit: BoxFit.fill,
+              width: double.infinity,
+              height: double.infinity,
             ),
-            SizedBox(height: 10),
-            Text(
-              AppSettingsPreferences().name,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: AppColors.whiteColor),
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              // Black layer with 50% opacity
+              width: double.infinity,
+              height: double.infinity,
             ),
-            SizedBox(height: 20),
           ],
         ),
-      ),
-    ],
+        Positioned(
+          right: 0,
+          left: 0,
+          top: Dimensions.paddingSizeSmall,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: AppColors.whiteColor,
+                backgroundImage: AssetImage(AppImages.user),
+              ),
+              SizedBox(height: 10),
+              Text(
+                AppSettingsPreferences().name,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: AppColors.whiteColor),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ],
+    ),
   );
 }
 

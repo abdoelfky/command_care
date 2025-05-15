@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final addDoctorControllerProvider =
-StateNotifierProvider<SignUpController, bool>((ref) => SignUpController());
+StateNotifierProvider<HandleDoctorsController, bool>((ref) => HandleDoctorsController());
 
-class SignUpController extends StateNotifier<bool> {
-  SignUpController() : super(false); // `false` indicates not loading
+class HandleDoctorsController extends StateNotifier<bool> {
+  HandleDoctorsController() : super(false); // `false` indicates not loading
 
   Future<void> addDoctor({
     required String email,
@@ -29,7 +29,19 @@ class SignUpController extends StateNotifier<bool> {
         'password': password,
         'name': name,
         'id': uid,
-        'userType':'user',
+        'userType':'doctor',
+        'is_rented':false,
+        'created_at': Timestamp.now(),
+      });
+
+      await FirebaseFirestore.instance.collection('users')
+          .doc(userCredential.user?.uid).set({
+        'email': email,
+        'phone': phone,
+        'password': password,
+        'name': name,
+        'id': uid,
+        'userType':'doctor',
         'is_rented':false,
         'created_at': Timestamp.now(),
       });
@@ -39,6 +51,18 @@ class SignUpController extends StateNotifier<bool> {
       throw Exception('Failed to add doctor');
     } finally {
       state = false; // Set loading to false
+    }
+  }
+  /// Removes doctor Firestore records by UID
+  Future<void> removeDoctor({required String uid}) async {
+    state = true;
+    try {
+      await FirebaseFirestore.instance.collection('Doctors').doc(uid).delete();
+      await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+    } catch (e) {
+      throw Exception('Failed to remove doctor');
+    } finally {
+      state = false;
     }
   }
 }

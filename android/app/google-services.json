@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "394921280082",
+    "project_id": "command-care-1613a",
+    "storage_bucket": "command-care-1613a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:394921280082:android:b628f2d5842d3e45f8958b",
+        "android_client_info": {
+          "package_name": "com.example.command_care"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPs0_j_zGG8dCaxcSKFx02-XvIyBPj_Ek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

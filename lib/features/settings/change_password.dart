@@ -20,8 +20,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   var newPasswordController = TextEditingController();
   var confirmNewPasswordController = TextEditingController();
   var formKey = GlobalKey<FormState>();
-  bool isObsecured1 = true;
-  bool isObsecured2 = true;
+  bool _obscureOld = true;
+  bool _obscureNew = true;
+
   var state;
   bool _obscurePassword = true;
 
@@ -29,61 +30,61 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     required String oldPassword,
     required String newPassword,
   }) async {
-    setState(() {
-      state = 'loading';
-    });
-    var user = FirebaseAuth.instance.currentUser;
-    String email = user!.email!;
+    setState(() => state = 'loading');
+
+    final user = FirebaseAuth.instance.currentUser;
+    final email = user?.email;
+
+    if (email == null) {
+      setState(() => state = 'error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User email not found.')),
+      );
+      return;
+    }
+
+    final credential =
+        EmailAuthProvider.credential(email: email, password: oldPassword);
 
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: oldPassword,
-      );
+      // Reauthenticate
+      await user!.reauthenticateWithCredential(credential);
 
-      user.updatePassword(newPassword).then((_) {
-        print("Successfully changed password");
-        setState(() {
-          state = 'success';
-        });
-        setState(() {
-          newPasswordController.text = '';
-        });
-        setState(() {
-          oldPasswordController.text = '';
-        });
-        setState(() {
-          confirmNewPasswordController.text = '';
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('password changed successfully',),backgroundColor: AppColors.successColor,),
-        );
-      }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('password change failed: $error')),
-        );
+      // Then change password
+      await user.updatePassword(newPassword);
 
-        print("Password can't be changed" + error.toString());
-
-        setState(() {
-          state = 'error';
-        });
-        //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
-      });
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-      }
       setState(() {
-        state = 'error';
+        state = 'success';
+        oldPasswordController.clear();
+        newPasswordController.clear();
+        confirmNewPasswordController.clear();
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('password change failed: ${e.code.toString()}')),
-      );
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Password changed successfully'),
+          backgroundColor: AppColors.successColor,
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() => state = 'error');
+
+      String errorMessage = switch (e.code) {
+        'wrong-password' => 'Incorrect old password.',
+        'weak-password' => 'Password should be at least 6 characters.',
+        'requires-recent-login' =>
+          'Please log in again to update your password.',
+        _ => 'Password change failed: ${e.message}',
+      };
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } catch (e) {
+      setState(() => state = 'error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An unexpected error occurred: $e')),
+      );
     }
   }
 
@@ -92,7 +93,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-
       appBar: PrimaryAppBar(title: 'Settings'),
       body: BackgroundScreen(
         child: SingleChildScrollView(
@@ -119,8 +119,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   PasswordField(
                     text: 'Old Password',
                     controller: oldPasswordController,
-                    obscureText: _obscurePassword,
-                    onVisibilityToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                    obscureText: _obscureOld,
+                    onVisibilityToggle: () =>
+                        setState(() => _obscureOld = !_obscureOld),
                   ),
                   const SizedBox(
                     height: 25.0,
@@ -128,8 +129,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   PasswordField(
                     text: 'New Password',
                     controller: newPasswordController,
-                    obscureText: _obscurePassword,
-                    onVisibilityToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                    obscureText: _obscureNew,
+                    onVisibilityToggle: () =>
+                        setState(() => _obscureNew = !_obscureNew),
                   ),
                   const SizedBox(
                     height: 25.0,
@@ -149,7 +151,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           );
                         }
                       },
-
                     ),
                     fallback: (context) =>
                         Center(child: CircularProgressIndicator()),
@@ -157,26 +158,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   SizedBox(
                     height: 12,
                   ),
-                  // InkWell(
-                  //   onTap: () {
-                  //     Get.to(() => ResetPasswordScreen(),
-                  //         transition: Transition.circularReveal);
-                  //   },
-                  //   child: Padding(
-                  //     padding: EdgeInsets.only(left: 28),
-                  //     child: Align(
-                  //       alignment: Alignment.centerLeft,
-                  //       child: Text(
-                  //         "هل نسيت كلمة السر؟",
-                  //         style: TextStyle(
-                  //           fontSize: 15,
-                  //           color: Color(0XFF2D005D),
-                  //         ),
-                  //         textAlign: TextAlign.left,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),

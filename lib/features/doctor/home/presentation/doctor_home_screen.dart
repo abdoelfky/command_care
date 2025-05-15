@@ -3,6 +3,7 @@ import 'package:command_care/core/widgets/header_name.dart';
 import 'package:command_care/features/doctor/home/controllers/providers.dart.dart';
 import 'package:command_care/features/doctor/home/presentation/widgets/statistics_section.dart';
 import 'package:command_care/features/doctor/home/presentation/widgets/weekly_appointments_chart.dart';
+import 'package:command_care/features/user/home/presentation/widgets/services_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:command_care/core/utils/dimensions.dart';
@@ -27,6 +28,7 @@ class DoctorHomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 HeaderName(),
+                ServicesSection(),
                 const SizedBox(height: Dimensions.paddingSizeDefault),
                 StatisticsSection(),
                 const SizedBox(height: Dimensions.paddingSizeDefault),
